@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="index.js"></script>
+    <link rel="stylesheet" href="update.css">
+</head>
+<div class="homeDiv">
+    <a href="index.html">
+        <h1 class="todo">TaskForge</h1>
+<!--        <img src="./asset/icons8-home-ios-16-filled/icons8-home-500.png" alt="home">-->
+
+    </a>
+    <label >
+        <input type="text" class="taskInput" placeholder="Search for task">
+        <button class="searchBtn" onclick="searchToEdit()">Search</button>
+
+    </label>
+    <div class="errorContainer"></div>
+    <div class="resultContainer"></div>
+
+</div>
+<body>
+<div class="task-container" id="taskContainer">
+
+</div>
+<div>
+    <button class="nextBtn" onclick="fetchNextTasks()">Next</button>
+    <button class="prevBtn" onclick="fetchPrevTasks()">Previous</button>
+
+
+</div>
+
+
+
+</body>
+</html>

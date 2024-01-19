@@ -1,0 +1,50 @@
+/*@import url('https://fonts.cdnfonts.com/css/isabella');*/
+@import url('https://fonts.cdnfonts.com/css/tracing-blood');
+body {
+
+    background-repeat: no-repeat;
+    background-position: center;
+
+
+}
+.main-cont{
+
+    justify-content: space-between;
+    align-content: space-between;
+
+}
+
+.app-name{
+    font-family: 'Tracing Blood', sans-serif;
+    font-size: 100px;
+    color: steelblue;
+
+}
+
+.main {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    height: 50vh;
+    gap: 50px;
+    margin: auto;
+}
+
+
+.main a img {
+    width: 100px;
+    height: auto;
+}
+
+
+.main a {
+    margin: 40px;
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
