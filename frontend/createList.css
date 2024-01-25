@@ -1,4 +1,4 @@
-@import url('https://fonts.cdnfonts.com/css/isabella');
+@import url('https://fonts.cdnfonts.com/css/tracing-blood');
 body {
     background-image: url("./asset/pexels-tima-miroshnichenko-6913186.jpg");
     background-position: center;
@@ -69,10 +69,35 @@ body {
     font-family: 'Isabella', sans-serif;
     font-size: 70px;
     color: steelblue;
-    /*padding-left: 50px;*/
     gap: 0pc;
     margin: 0px;
 
+}
+#alarmButton {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+}
 
+#alarmButton.on {
+    background-color: #45a049;
+}
+
+
+#alarmStatus {
+    font-size: 14px;
+    display: block;
+    margin-top: 5px;
+    color: white;
 
 }
+
+
+

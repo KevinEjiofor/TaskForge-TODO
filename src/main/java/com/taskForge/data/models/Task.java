@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter;
 public class Task {
     @Id
     private String id;
-    private LocalDateTime taskTime;
+    private LocalDateTime taskDate;
     private String description;
     private LocalDateTime completionDate;
     private String completedTask;
@@ -21,6 +21,14 @@ public class Task {
         }
         return null;
 
+
+    }
+    public String getTaskDate(){
+        if (taskDate != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy 'Time' hh:mm a");
+            return taskDate.format(formatter);
+        }
+        return null;
 
     }
 

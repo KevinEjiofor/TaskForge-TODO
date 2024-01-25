@@ -1,3 +1,20 @@
+const alarmSound = new Audio('../frontend/asset/mixkit-retro-game-emergency-alarm-1000.wav');
+
+function toggleAlarm() {
+    const alarmButton = document.getElementById('alarmButton');
+    const alarmStatus = document.getElementById('alarmStatus');
+
+    if (alarmSound.paused) {
+
+        alarmStatus.textContent = 'On';
+
+    } else {
+
+        alarmStatus.textContent = 'Off';
+    }
+}
+
+
 function createTodoList() {
     hideError();
     const inputElement = document.getElementById('input');
@@ -27,7 +44,7 @@ function createTodoList() {
         completionDate: endTaskDateTime,
     };
 
-    const createUrl = "http://localhost:8080/api/v1/task";
+    const createUrl = "http://localhost:8080/api/v1/createTasks";
 
     console.log("Request payload:", data);
 
@@ -48,18 +65,41 @@ function createTodoList() {
         })
         .then(data => {
             console.log("Response from server:", data);
-            if(typeof data.data === 'string'){
-                displayError(data.data)
-            }else {
+            if (typeof data.data === 'string') {
+                displayError(data.data);
+            } else {
                 updateUIWithTask(data.data);
+                setTaskAlarm(data.data);
             }
         })
         .catch((error) => {
-            displayError(error)
+            displayError(error);
         });
 }
+
+function setTaskAlarm(task) {
+    const { id, description, completionDate, taskDate } = task;
+
+    const taskDateTime = new Date(taskDate);
+    const now = new Date();
+
+    const timeUntilTask = taskDateTime - now;
+
+    if (timeUntilTask > 0) {
+        setTimeout(function () {
+            playAlarmSound();
+            alert('It\'s time to do the task \n' + description);
+        }, timeUntilTask);
+    }
+}
+
+
+function playAlarmSound() {
+    alarmSound.play();
+}
+
 function updateUIWithTask(data) {
-    const { id, description, completionDate, taskTime } = data;
+    const { id, description, completionDate, taskDate } = data;
 
     const todoTableBody = document.getElementById('todoListBody');
     const row = todoTableBody.insertRow();
@@ -68,7 +108,7 @@ function updateUIWithTask(data) {
     const cell3 = row.insertCell(2);
 
     cell1.textContent = description;
-    cell2.textContent = taskTime;
+    cell2.textContent = taskDate;
     cell3.textContent = completionDate;
 
     cell1.style.paddingRight = '20px';
@@ -80,6 +120,91 @@ function updateUIWithTask(data) {
 }
 
 
+
+// function createTodoList() {
+
+//     hideError();
+//     const inputElement = document.getElementById('input');
+//     const inputStartDateTime = document.getElementById('inputT');
+//     const inputEndDateTime = document.getElementById('inputE');
+//
+//     const input = inputElement.value;
+//     const startTaskDateTime = inputStartDateTime.value;
+//     const endTaskDateTime = inputEndDateTime.value;
+//
+//     if (!input || !startTaskDateTime || !endTaskDateTime) {
+//         alert("Please enter valid task details, start date, and end date");
+//         return;
+//     }
+//
+//     const startDate = new Date(startTaskDateTime);
+//     const endDate = new Date(endTaskDateTime);
+//
+//     if (startDate >= endDate) {
+//         alert("Start date should be before the end date");
+//         return;
+//     }
+//
+//     const data = {
+//         description: input,
+//         taskDate: startTaskDateTime,
+//         completionDate: endTaskDateTime,
+//     };
+//
+//     const createUrl = "http://localhost:8080/api/v1/task";
+//
+//     console.log("Request payload:", data);
+//
+//     fetch(createUrl, {
+//         method: 'POST',
+//         headers: {
+//             "Content-Type": "application/json; charset=UTF-8"
+//         },
+//         body: JSON.stringify(data)
+//     })
+//         .then(response => {
+//             console.log("Response status:", response.status);
+//
+//             if (!response.ok) {
+//                 throw new Error(`HTTP error! Status: ${response.status}`);
+//             }
+//             return response.json();
+//         })
+//         .then(data => {
+//             console.log("Response from server:", data);
+//             if(typeof data.data === 'string'){
+//                 displayError(data.data)
+//
+//             }else {
+//                 updateUIWithTask(data.data);
+//             }
+//         })
+//         .catch((error) => {
+//             displayError(error)
+//         });
+// }
+// function updateUIWithTask(data) {
+//     const { id, description, completionDate, taskTime } = data;
+//
+//     const todoTableBody = document.getElementById('todoListBody');
+//     const row = todoTableBody.insertRow();
+//     const cell1 = row.insertCell(0);
+//     const cell2 = row.insertCell(1);
+//     const cell3 = row.insertCell(2);
+//
+//     cell1.textContent = description;
+//     cell2.textContent = taskTime;
+//     cell3.textContent = completionDate;
+//
+//     cell1.style.paddingRight = '20px';
+//     cell2.style.paddingRight = '10px';
+//
+//     console.log('You have successfully added a new task');
+//
+//     clearInputFields();
+// }
+//
+//
 function clearInputFields() {
     document.getElementById('input').value = '';
     document.getElementById('inputT').value = '';
@@ -151,7 +276,7 @@ function displayTaskResult(data) {
 
     cell1.textContent = data.description;
     cell2.textContent = data.taskTime;
-    cell3.textContent = data.completedTask;
+    cell3.textContent = data.completionDate;
 
     resultContainer.appendChild(table);
     resultContainer.style.display = "block";
@@ -190,7 +315,7 @@ function fetchTasks() {
     const taskContainer = document.getElementById('taskContainer');
     taskContainer.innerHTML = '';
 
-    fetch(`http://localhost:8080/api/v1/getAllTask?page=${currentPage}`)
+    fetch(`http://localhost:8080/api/v1/tasks?page=${currentPage}`)
         .then(response => response.json())
         .then(data => {
             if (data && data.data && Array.isArray(data.data)) {
@@ -360,9 +485,8 @@ function searchToEdit(){
             }
         })
         .catch(error);
-        displayError(`Error fetching data: ${error.message}`);
+    displayError(`Error fetching data: ${error.message}`);
 
 }
-
 
 

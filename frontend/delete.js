@@ -8,7 +8,7 @@ function fetchGetAllTasks() {
     const taskContainer3 = document.getElementById('taskContainer3');
     taskContainer3.innerHTML = '';
 
-    fetch(`http://localhost:8080/api/v1/getAllTask?page=${currentPage}`)
+    fetch(`http://localhost:8080/api/v1/tasks?page=${currentPage}`)
         .then(response => response.json())
         .then(data => {
             if (data && data.data && Array.isArray(data.data)) {

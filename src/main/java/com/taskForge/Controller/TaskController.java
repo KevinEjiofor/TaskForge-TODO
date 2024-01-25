@@ -23,11 +23,9 @@ public class TaskController {
 
 
 
-    @PostMapping("/task")
+    @PostMapping("/createTasks")
     public ApiRespond<Object> createNewTask(@RequestBody CreateTaskRequest createTaskRequest) {
-        System.out.println("Received payload: " + createTaskRequest.toString());
         try {
-            System.out.println("i got here");
             Task createdTask = toDoListService.createNewTask(createTaskRequest);
             return new ApiRespond<>(createdTask);
         } catch (Exception e) {
@@ -68,7 +66,7 @@ public class TaskController {
     }
 
 
-    @GetMapping("/getAllTask")
+    @GetMapping("/tasks")
     public ApiRespond<Object> getAllTask(@RequestParam(defaultValue = "0") int page,
                                          @RequestParam(defaultValue = "10") int pageSize) {
         try {
