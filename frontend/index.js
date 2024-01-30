@@ -244,11 +244,11 @@ function searchForTask() {
                 displayTaskResult(data.data);
             }
         })
-        .catch(error);
-
-    displayError(`Error fetching data: ${error.message}`);
-
+        .catch(error => {
+            displayError(`Error fetching data: ${error.message}`);
+        });
 }
+
 function displayTaskResult(data) {
     const resultContainer = document.querySelector(".resultContainer");
     resultContainer.innerHTML = "";
@@ -256,31 +256,28 @@ function displayTaskResult(data) {
     const table = document.createElement("table");
 
     const headerRow = table.insertRow();
+    const headers = ["Task description", "Start date and time", "End date and time"];
 
-    const header1 = document.createElement("th");
-    header1.textContent = "Task description";
-    headerRow.appendChild(header1);
+    headers.forEach(headerText => {
+        const header = document.createElement("th");
+        header.textContent = headerText;
+        headerRow.appendChild(header);
+    });
 
-    const header2 = document.createElement("th");
-    header2.textContent = "Start date and time";
-    headerRow.appendChild(header2);
+    data.forEach(task => {
+        const dataRow = table.insertRow();
+        const cells = [task.description, task.taskDate, task.completionDate];
 
-    const header3 = document.createElement("th");
-    header3.textContent = "End date and time";
-    headerRow.appendChild(header3);
-
-    const dataRow = table.insertRow();
-    const cell1 = dataRow.insertCell(0);
-    const cell2 = dataRow.insertCell(1);
-    const cell3 = dataRow.insertCell(2);
-
-    cell1.textContent = data.description;
-    cell2.textContent = data.taskTime;
-    cell3.textContent = data.completionDate;
+        cells.forEach(cellText => {
+            const cell = dataRow.insertCell();
+            cell.textContent = cellText;
+        });
+    });
 
     resultContainer.appendChild(table);
     resultContainer.style.display = "block";
 }
+
 function displayError(errorMessage) {
     const errorContainer = document.querySelector(".errorContainer");
     errorContainer.innerHTML = "";
@@ -389,9 +386,8 @@ function submitEdit(task, updatedDescription, updatedStartDate, updatedEndDate) 
             closeOverlay();
 
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error);
 }
-
 
 function showEditForm(task) {
     const overlay = document.createElement('div');
@@ -410,14 +406,14 @@ function showEditForm(task) {
     startDateLabel.textContent = 'Start Date and Time:';
     const startDateInput = document.createElement('input');
     startDateInput.type = 'datetime-local';
-    startDateInput.value = task.startDate;
+    startDateInput.value = task.taskDate;  // Corrected property access
     startDateLabel.appendChild(startDateInput);
 
     const endDateLabel = document.createElement('label');
     endDateLabel.textContent = 'End Date and Time:';
     const endDateInput = document.createElement('input');
     endDateInput.type = 'datetime-local';
-    endDateInput.value = task.endDate;
+    endDateInput.value = task.completionDate;  // Corrected property access
     endDateLabel.appendChild(endDateInput);
 
     const submitButton = document.createElement('button');
@@ -425,16 +421,15 @@ function showEditForm(task) {
     submitButton.type = 'button';
     submitButton.onclick = () => submitEdit(task, descriptionInput.value, startDateInput.value, endDateInput.value);
 
-    submitButton.style.marginRight = "20px"
+    submitButton.style.marginRight = "20px";
 
     const cancelButton = document.createElement('button');
     cancelButton.textContent = 'Cancel';
     cancelButton.className = 'cancelButton';
     cancelButton.type = 'button';
     cancelButton.onclick = () => {
-        closeOverlay()
+        closeOverlay();
         fetchTasks();
-
     };
 
     editForm.appendChild(descriptionLabel);
@@ -447,13 +442,14 @@ function showEditForm(task) {
 
     document.body.appendChild(overlay);
 }
+
 function closeOverlay() {
     const overlay = document.querySelector('.overlay');
     if (overlay) {
         document.body.removeChild(overlay);
     }
 }
-function searchToEdit(){
+function searchToEdit() {
     hideError();
     const resultContainer = document.querySelector(".resultContainer");
     resultContainer.innerHTML = "";
@@ -478,14 +474,61 @@ function searchToEdit(){
         .then(data => {
             console.log(data);
             if (typeof data.data === 'string') {
-                displayError(data.data)
+                displayError(data.data);
             } else {
-                console.log(data.data)
-                showEditForm(data.data);
+                console.log(data.data);
+                displayTaskToEdit(data.data);
+
             }
         })
-        .catch(error);
-    displayError(`Error fetching data: ${error.message}`);
+        .catch(error.getError);
+
+    function displayTaskToEdit(data) {
+        const resultContainer = document.querySelector(".resultContainer");
+        resultContainer.innerHTML = "";
+
+        if (data.length === 0) {
+            resultContainer.textContent = "No results found.";
+            return;
+        }
+
+        const table = document.createElement("table");
+
+        const headerRow = table.insertRow();
+
+        const header1 = document.createElement("th");
+        header1.textContent = "Task description";
+        headerRow.appendChild(header1);
+
+        const header2 = document.createElement("th");
+        header2.textContent = "Start date and time";
+        headerRow.appendChild(header2);
+
+        const header3 = document.createElement("th");
+        header3.textContent = "End date and time";
+        headerRow.appendChild(header3);
+
+        data.forEach(task => {
+            const dataRow = table.insertRow();
+            const cell1 = dataRow.insertCell(0);
+            const cell2 = dataRow.insertCell(1);
+            const cell3 = dataRow.insertCell(2);
+
+            cell1.textContent = task.description;
+            cell2.textContent = task.taskDate;
+            cell3.textContent = task.completionDate;
+
+            const editButton = document.createElement('button');
+            editButton.textContent = 'Edit';
+            editButton.onclick = () => showEditForm(task);
+            cell3.appendChild(editButton);
+        });
+
+        resultContainer.appendChild(table);
+        resultContainer.style.display = "block";
+    }
+
+
 
 }
 

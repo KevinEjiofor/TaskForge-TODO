@@ -11,6 +11,8 @@ public class UpdateTaskRequest {
     private String id;
     private LocalDateTime taskDate;
     private String oldDescription;
+    private LocalDateTime oldTaskDate;
+    private LocalDateTime oldCompletionDate;
     private String newDescription;
     private String completedTask;
     private LocalDateTime completionDate;

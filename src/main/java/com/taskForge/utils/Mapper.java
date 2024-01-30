@@ -6,7 +6,7 @@ import com.taskForge.dto.Request.CreateTaskRequest;
 import com.taskForge.dto.Request.UpdateTaskRequest;
 
 public class Mapper {
-    public static Task map(CreateTaskRequest createTaskRequest){
+    public static Task createTaskRequestMap(CreateTaskRequest createTaskRequest){
         Task task = new Task();
 
 
@@ -18,12 +18,20 @@ public class Mapper {
 
         return task;
     }
-    public static Task map(UpdateTaskRequest updateTaskRequest, Task existingTask) {
-
+    public static Task updateTaskRequestMap(UpdateTaskRequest updateTaskRequest, Task existingTask) {
         existingTask.setDescription(updateTaskRequest.getNewDescription());
-        existingTask.setTaskDate(updateTaskRequest.getTaskDate());
-        existingTask.setCompletionDate(updateTaskRequest.getCompletionDate());
-        existingTask.setCompletedTask(updateTaskRequest.getCompletedTask());
+
+        if (updateTaskRequest.getCompletedTask() == null || updateTaskRequest.getTaskDate() == null) {
+            existingTask.setTaskDate(updateTaskRequest.getOldTaskDate());
+            existingTask.setCompletionDate(updateTaskRequest.getOldCompletionDate());
+            existingTask.setCompletedTask(updateTaskRequest.getCompletedTask());
+
+        }else {
+            existingTask.setTaskDate(updateTaskRequest.getTaskDate());
+            existingTask.setCompletionDate(updateTaskRequest.getCompletionDate());
+            existingTask.setCompletedTask(updateTaskRequest.getCompletedTask());
+        }
+
 
         return existingTask;
     }
