@@ -5,7 +5,9 @@ import com.taskForge.data.models.Task;
 import com.taskForge.dto.Request.CreateTaskRequest;
 import com.taskForge.dto.Request.UpdateTaskRequest;
 import com.taskForge.dto.Respond.ApiRespond;
+import com.taskForge.exceptions.TaskNotFoundException;
 import com.taskForge.services.TodoListService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,9 +17,9 @@ import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:63342")
 
-//@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1")
+@Slf4j
 public class TaskController {
     @Autowired
     private TodoListService toDoListService;
@@ -31,20 +33,26 @@ public class TaskController {
             return new ApiRespond<>(createdTask);
 
 
+
+
     }
+
+
     @GetMapping("/findByDescription")
-    public ApiRespond<Object> findByDescription(String description){
+    public ApiRespond<Object> findByDescription(@RequestParam String description) {
 
-            List<Task> task = toDoListService.findByDescription(description);
-            return new ApiRespond<>(task);
+        List<Task> task = toDoListService.findByDescription(description);
+        return new ApiRespond<>(task);
 
     }
-    @DeleteMapping("/deleteByDescription")
-    public ApiRespond<String> deleteTaskByDescription(String description){
 
-            toDoListService.deleteByDescription(description);
-            String task = "Task has been deleted successfully";
-            return new ApiRespond<>(task);
+
+    @DeleteMapping("/deleteByDescription")
+    public ApiRespond<Object> deleteTaskByDescription(String description){
+
+                toDoListService.deleteByDescription(description);
+                String task = "Task has been deleted successfully";
+                return new ApiRespond<>(task);
 
 
     }
@@ -55,6 +63,7 @@ public class TaskController {
             Task updateTask = toDoListService.updateTask(updateTaskRequest);
             return new ApiRespond<>(updateTask);
 
+
     }
 
 
@@ -64,6 +73,7 @@ public class TaskController {
 
             List<Task> tasks = toDoListService.getAllTasks(page, pageSize);
             return new ApiRespond<>(tasks);
+
 
     }
 

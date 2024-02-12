@@ -6,7 +6,10 @@ import com.taskForge.data.repositories.CompletedTaskRepository;
 import com.taskForge.data.repositories.TaskRepository;
 import com.taskForge.dto.Request.CreateTaskRequest;
 import com.taskForge.dto.Request.UpdateTaskRequest;
-import com.taskForge.expections.TaskNotFoundException;
+import com.taskForge.exceptions.SearchLengthException;
+import com.taskForge.exceptions.TaskExistException;
+import com.taskForge.exceptions.TaskNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -15,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +27,7 @@ import static com.taskForge.utils.Mapper.*;
 
 
 @Service
+@Slf4j
 public class TodoListServiceImpl implements TodoListService {
     @Autowired
     private TaskRepository toDoListRepository;
@@ -44,15 +49,16 @@ public class TodoListServiceImpl implements TodoListService {
 
     @Override
     public List<Task> findByDescription(String description) {
-        Optional<Task> exactMatch = toDoListRepository.findTaskByDescription(description);
-
-        if (exactMatch.isPresent()) {
-            return Collections.singletonList(exactMatch.get());
-        } else if (description.length() < 3) {
-            throw new IllegalArgumentException("Description length must be at least 3 characters for search.");
-        } else {
-            return toDoListRepository.findTasksByDescriptionStartingWith(description.substring(0, 3));
+        if (description.length() < 3) {
+            throw new SearchLengthException("Description must be at least 3 characters for search.");
         }
+
+        Optional<Task> exactMatch = toDoListRepository.findTaskByDescription(description);
+        if(exactMatch.isEmpty()){
+            throw new TaskNotFoundException("Task Not Found");
+        }
+
+        return Collections.singletonList(exactMatch.get());
     }
 
 
@@ -92,19 +98,14 @@ public class TodoListServiceImpl implements TodoListService {
     public void validate(String description, LocalDateTime taskDate) {
         Optional<Task> existingTask = toDoListRepository.findTaskByDescription(description);
 
-        if (existingTask.isPresent()){
-            if(existingTask.get().getTaskDate().equalsIgnoreCase(String.valueOf(taskDate)))
-                throw new TaskNotFoundException("Task with the same description and the same task date already exists");
-        }
+        existingTask.ifPresent(task -> {
+            LocalDateTime existingTaskDate = LocalDateTime.parse(task.getTaskDate(), DateTimeFormatter.ofPattern("MMMM dd, yyyy 'Time' hh:mm a"));
+            if (existingTaskDate.equals(taskDate)) {
+                throw new TaskExistException("Task with the same description and the same task date already exists");
+            }
+        });
     }
 
-
-//        public void validate(String description) {
-//        if (toDoListRepository.findTaskByDescription(description).isPresent()){
-//            throw new TaskNotFoundException("Task description exist already");
-//
-//        }
-//    }
     private Task findTask(String description){
         Optional<Task> task = toDoListRepository.findTaskByDescription(description);
         if (task.isPresent()){

@@ -58,15 +58,13 @@ function createTodoList() {
         .then(response => {
             console.log("Response status:", response.status);
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
+
             return response.json();
         })
         .then(data => {
             console.log("Response from server:", data);
-            if (typeof data.data === 'string') {
-                displayError(data.data);
+            if (data.message) {
+                displayError(data.message);
             } else {
                 updateUIWithTask(data.data);
                 setTaskAlarm(data.data);
@@ -119,92 +117,6 @@ function updateUIWithTask(data) {
     clearInputFields();
 }
 
-
-
-// function createTodoList() {
-
-//     hideError();
-//     const inputElement = document.getElementById('input');
-//     const inputStartDateTime = document.getElementById('inputT');
-//     const inputEndDateTime = document.getElementById('inputE');
-//
-//     const input = inputElement.value;
-//     const startTaskDateTime = inputStartDateTime.value;
-//     const endTaskDateTime = inputEndDateTime.value;
-//
-//     if (!input || !startTaskDateTime || !endTaskDateTime) {
-//         alert("Please enter valid task details, start date, and end date");
-//         return;
-//     }
-//
-//     const startDate = new Date(startTaskDateTime);
-//     const endDate = new Date(endTaskDateTime);
-//
-//     if (startDate >= endDate) {
-//         alert("Start date should be before the end date");
-//         return;
-//     }
-//
-//     const data = {
-//         description: input,
-//         taskDate: startTaskDateTime,
-//         completionDate: endTaskDateTime,
-//     };
-//
-//     const createUrl = "http://localhost:8080/api/v1/task";
-//
-//     console.log("Request payload:", data);
-//
-//     fetch(createUrl, {
-//         method: 'POST',
-//         headers: {
-//             "Content-Type": "application/json; charset=UTF-8"
-//         },
-//         body: JSON.stringify(data)
-//     })
-//         .then(response => {
-//             console.log("Response status:", response.status);
-//
-//             if (!response.ok) {
-//                 throw new Error(`HTTP error! Status: ${response.status}`);
-//             }
-//             return response.json();
-//         })
-//         .then(data => {
-//             console.log("Response from server:", data);
-//             if(typeof data.data === 'string'){
-//                 displayError(data.data)
-//
-//             }else {
-//                 updateUIWithTask(data.data);
-//             }
-//         })
-//         .catch((error) => {
-//             displayError(error)
-//         });
-// }
-// function updateUIWithTask(data) {
-//     const { id, description, completionDate, taskTime } = data;
-//
-//     const todoTableBody = document.getElementById('todoListBody');
-//     const row = todoTableBody.insertRow();
-//     const cell1 = row.insertCell(0);
-//     const cell2 = row.insertCell(1);
-//     const cell3 = row.insertCell(2);
-//
-//     cell1.textContent = description;
-//     cell2.textContent = taskTime;
-//     cell3.textContent = completionDate;
-//
-//     cell1.style.paddingRight = '20px';
-//     cell2.style.paddingRight = '10px';
-//
-//     console.log('You have successfully added a new task');
-//
-//     clearInputFields();
-// }
-//
-//
 function clearInputFields() {
     document.getElementById('input').value = '';
     document.getElementById('inputT').value = '';
@@ -230,22 +142,21 @@ function searchForTask() {
 
     fetch(createUrl)
         .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
             return response.json();
         })
         .then(data => {
             console.log(data);
-            if (typeof data.data === 'string') {
-                displayError(data.data)
+            if(data.message){
+
+                displayError(data.message)
             } else {
                 console.log(data.data)
                 displayTaskResult(data.data);
             }
         })
         .catch(error => {
-            displayError(`Error fetching data: ${error.message}`);
+            console.error('Error:', error);
+            displayError('An unexpected error occurred');
         });
 }
 
@@ -466,15 +377,12 @@ function searchToEdit() {
 
     fetch(createUrl)
         .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
             return response.json();
         })
         .then(data => {
             console.log(data);
-            if (typeof data.data === 'string') {
-                displayError(data.data);
+            if (data.message) {
+                displayError(data.message);
             } else {
                 console.log(data.data);
                 displayTaskToEdit(data.data);

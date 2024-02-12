@@ -7,7 +7,6 @@ import com.taskForge.data.repositories.CompletedTaskRepository;
 import com.taskForge.data.repositories.TaskRepository;
 import com.taskForge.dto.Request.CreateTaskRequest;
 import com.taskForge.dto.Request.UpdateTaskRequest;
-import com.taskForge.expections.TaskNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;

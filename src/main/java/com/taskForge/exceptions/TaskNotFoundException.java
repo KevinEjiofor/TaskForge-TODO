@@ -1,4 +1,4 @@
-package com.taskForge.expections;
+package com.taskForge.exceptions;
 
 public class TaskNotFoundException extends RuntimeException{
 
