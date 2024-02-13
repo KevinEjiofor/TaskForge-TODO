@@ -12,7 +12,7 @@ public class Task {
     private LocalDateTime taskDate;
     private String description;
     private LocalDateTime completionDate;
-    private String completedTask;
+    private Boolean completedTask;
 
     public String getCompletionDate() {
         if (completionDate != null) {

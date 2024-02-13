@@ -1,5 +1,7 @@
 package com.taskForge.exceptions;
 
+import com.taskForge.data.models.Task;
+import com.taskForge.dto.Request.TaskDoneRequest;
 import com.taskForge.dto.Respond.ApiRespond;
 
 
@@ -34,6 +36,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         ExceptionsRespond response = new ExceptionsRespond();
         response.setMessage("Task with the same description and the same task date already exists");
+        response.setTimeDate(LocalDateTime.now());
+        response.setErrorCode(101);
+
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+
+
+    }
+    @ExceptionHandler(TaskExistException.class)
+    public ResponseEntity<Object> completeTaskHandlerException(TaskNotFoundException ex, WebRequest request) {
+
+        ExceptionsRespond response = new ExceptionsRespond();
+        TaskDoneRequest taskRequest = new TaskDoneRequest();
+        response.setMessage("You are meant to finish the task " + taskRequest.getCompletionDate());
         response.setTimeDate(LocalDateTime.now());
         response.setErrorCode(101);
 

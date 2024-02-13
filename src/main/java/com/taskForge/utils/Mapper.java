@@ -3,7 +3,11 @@ package com.taskForge.utils;
 
 import com.taskForge.data.models.Task;
 import com.taskForge.dto.Request.CreateTaskRequest;
+import com.taskForge.dto.Request.TaskDoneRequest;
 import com.taskForge.dto.Request.UpdateTaskRequest;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Mapper {
     public static Task createTaskRequestMap(CreateTaskRequest createTaskRequest){
@@ -14,7 +18,7 @@ public class Mapper {
         task.setDescription(createTaskRequest.getDescription());
         task.setTaskDate(createTaskRequest.getTaskDate());
         task.setCompletionDate(createTaskRequest.getCompletionDate());
-        task.setCompletedTask(createTaskRequest.getCompletedTask());
+        task.setCompletedTask(createTaskRequest.isCompletedTask());
 
         return task;
     }
@@ -32,8 +36,22 @@ public class Mapper {
             existingTask.setCompletedTask(updateTaskRequest.getCompletedTask());
         }
 
-
         return existingTask;
+    }
+    public  static Task taskCompleted(TaskDoneRequest taskDoneRequest){
+        Task completedTask = new Task();
+
+        completedTask.setDescription(taskDoneRequest.getDescription());
+        completedTask.setCompletedTask(taskDoneRequest.isCompletedTask());
+
+        return completedTask;
+
+
+
+    }
+    public static LocalDateTime parseDate(String dateString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy 'Time' hh:mm a");
+        return LocalDateTime.parse(dateString, formatter);
     }
 
 }

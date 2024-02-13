@@ -114,15 +114,12 @@ function searchToDelete(){
 
     fetch(createUrl)
         .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
             return response.json();
         })
         .then(data => {
             console.log(data);
-            if (typeof data.data === 'string') {
-                displayError(data.data)
+            if (data.message) {
+                displayError(data.message);
             } else {
                 console.log(data.data)
                 deleteTaskConfirmation(data.data.description);

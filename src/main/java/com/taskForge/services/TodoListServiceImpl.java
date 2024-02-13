@@ -5,10 +5,13 @@ import com.taskForge.data.models.Task;
 import com.taskForge.data.repositories.CompletedTaskRepository;
 import com.taskForge.data.repositories.TaskRepository;
 import com.taskForge.dto.Request.CreateTaskRequest;
+import com.taskForge.dto.Request.TaskDoneRequest;
 import com.taskForge.dto.Request.UpdateTaskRequest;
 import com.taskForge.exceptions.SearchLengthException;
 import com.taskForge.exceptions.TaskExistException;
+import com.taskForge.exceptions.TaskNotCompletedException;
 import com.taskForge.exceptions.TaskNotFoundException;
+import com.taskForge.utils.Mapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -23,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static com.fasterxml.jackson.databind.type.LogicalType.DateTime;
 import static com.taskForge.utils.Mapper.*;
 
 
@@ -65,8 +69,20 @@ public class TodoListServiceImpl implements TodoListService {
 
 
     @Override
-    public boolean isTaskComplete(CreateTaskRequest createTaskRequest) {
-        return false;
+    public boolean isTaskComplete(TaskDoneRequest taskRequest) {
+
+            Task task = findTask(taskRequest.getDescription());
+            LocalDateTime completionDate = Mapper.parseDate(task.getCompletionDate());
+         if(completionDate.isBefore(LocalDateTime.now() )|| completionDate.equals(LocalDateTime.now())){
+             taskRequest.setCompletedTask(true);
+             toDoListRepository.save(taskCompleted(taskRequest));
+         }else {
+             throw new TaskNotCompletedException("You are meant to finish the task " + taskRequest.getCompletionDate());
+
+         }
+
+
+         return taskRequest.isCompletedTask();
     }
 
     @Override
@@ -99,7 +115,8 @@ public class TodoListServiceImpl implements TodoListService {
         Optional<Task> existingTask = toDoListRepository.findTaskByDescription(description);
 
         existingTask.ifPresent(task -> {
-            LocalDateTime existingTaskDate = LocalDateTime.parse(task.getTaskDate(), DateTimeFormatter.ofPattern("MMMM dd, yyyy 'Time' hh:mm a"));
+//            LocalDateTime existingTaskDate = LocalDateTime.parse(task.getTaskDate(), DateTimeFormatter.ofPattern("MMMM dd, yyyy 'Time' hh:mm a"));
+            LocalDateTime existingTaskDate = Mapper.parseDate(task.getTaskDate());
             if (existingTaskDate.equals(taskDate)) {
                 throw new TaskExistException("Task with the same description and the same task date already exists");
             }

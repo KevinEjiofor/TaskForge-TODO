@@ -14,6 +14,6 @@ public class UpdateTaskRequest {
     private LocalDateTime oldTaskDate;
     private LocalDateTime oldCompletionDate;
     private String newDescription;
-    private String completedTask;
+    private Boolean completedTask;
     private LocalDateTime completionDate;
 }

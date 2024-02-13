@@ -83,7 +83,7 @@ function setTaskAlarm(task) {
 
     const timeUntilTask = taskDateTime - now;
 
-    if (timeUntilTask > 0) {
+    if (timeUntilTask === 0) {
         setTimeout(function () {
             playAlarmSound();
             alert('It\'s time to do the task \n' + description);
@@ -317,14 +317,14 @@ function showEditForm(task) {
     startDateLabel.textContent = 'Start Date and Time:';
     const startDateInput = document.createElement('input');
     startDateInput.type = 'datetime-local';
-    startDateInput.value = task.taskDate;  // Corrected property access
+    startDateInput.value = task.taskDate;
     startDateLabel.appendChild(startDateInput);
 
     const endDateLabel = document.createElement('label');
     endDateLabel.textContent = 'End Date and Time:';
     const endDateInput = document.createElement('input');
     endDateInput.type = 'datetime-local';
-    endDateInput.value = task.completionDate;  // Corrected property access
+    endDateInput.value = task.completionDate;
     endDateLabel.appendChild(endDateInput);
 
     const submitButton = document.createElement('button');

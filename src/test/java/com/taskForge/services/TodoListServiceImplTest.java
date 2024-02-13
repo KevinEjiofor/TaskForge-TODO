@@ -6,7 +6,9 @@ import com.taskForge.data.models.Task;
 import com.taskForge.data.repositories.CompletedTaskRepository;
 import com.taskForge.data.repositories.TaskRepository;
 import com.taskForge.dto.Request.CreateTaskRequest;
+import com.taskForge.dto.Request.TaskDoneRequest;
 import com.taskForge.dto.Request.UpdateTaskRequest;
+import com.taskForge.exceptions.TaskNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -23,6 +25,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 
 @SpringBootTest
@@ -45,7 +48,7 @@ class TodoListServiceImplTest {
         task.setId(String.valueOf(1L));
         task.setDescription("New Task");
 
-        Mockito.when(toDoListRepository.save(any(Task.class))).thenReturn(task);
+        when(toDoListRepository.save(any(Task.class))).thenReturn(task);
 
         Task result = todoListService.createNewTask(createTaskRequest);
 
@@ -62,8 +65,8 @@ class TodoListServiceImplTest {
         Task existingTask = new Task();
         existingTask.setDescription("Old Task");
 
-        Mockito.when(toDoListRepository.findTaskByDescription("Old Task")).thenReturn(Optional.of(existingTask));
-        Mockito.when(toDoListRepository.save(any(Task.class))).thenReturn(existingTask);
+        when(toDoListRepository.findTaskByDescription("Old Task")).thenReturn(Optional.of(existingTask));
+        when(toDoListRepository.save(any(Task.class))).thenReturn(existingTask);
 
         Task result = todoListService.updateTask(updateTaskRequest);
 
@@ -78,7 +81,7 @@ class TodoListServiceImplTest {
 
         task.setDescription(description);
 
-        Mockito.when(toDoListRepository.findTaskByDescription(description)).thenReturn(Optional.of(task));
+        when(toDoListRepository.findTaskByDescription(description)).thenReturn(Optional.of(task));
 
 
         Optional<Task> result = toDoListRepository.findTaskByDescription(description);
@@ -87,18 +90,14 @@ class TodoListServiceImplTest {
         assertTrue(result.isPresent());
     }
 
-    @Test
-    public void testIsTaskComplete() {
-        CreateTaskRequest createTaskRequest = new CreateTaskRequest();
-        assertFalse(todoListService.isTaskComplete(createTaskRequest));
-    }
+
 
     @Test
     public void testGetAllTasks() {
         PageRequest pageRequest = PageRequest.of(0, 10);
         Page<Task> taskPage = new PageImpl<>(Collections.emptyList(), pageRequest, 0);
 
-        Mockito.when(toDoListRepository.findAll(pageRequest)).thenReturn(taskPage);
+        when(toDoListRepository.findAll(pageRequest)).thenReturn(taskPage);
 
         List<Task> result = todoListService.getAllTasks(0, 10);
 
@@ -111,7 +110,7 @@ class TodoListServiceImplTest {
         List<Task> completedTasks = new ArrayList<>();
         completedTasks.add(new Task());
 
-        Mockito.when(taskDoneRepository.findAll()).thenReturn(completedTasks);
+        when(taskDoneRepository.findAll()).thenReturn(completedTasks);
 
         List<Task> result = todoListService.findAllCompletedTask();
 
@@ -125,22 +124,87 @@ class TodoListServiceImplTest {
         Task task = new Task();
         task.setDescription(description);
 
-        Mockito.when(toDoListRepository.findTaskByDescription(description)).thenReturn(Optional.of(task));
+        when(toDoListRepository.findTaskByDescription(description)).thenReturn(Optional.of(task));
 
         todoListService.deleteByDescription(description);
 
         Mockito.verify(toDoListRepository, Mockito.times(1)).delete(task);
     }
+    @Test
+    public void testFindByDescriptionAndPage() {
+        Task task = new Task();
+        String description = "Sample Task";
+        task.setDescription(description);
 
-//    @Test
-//    public void testValidate() {
-//        String description = "ExistingTask";
-//        LocalDateTime taskDate = LocalDateTime.of(2023, 2, 22, 0, 0);
-//        Mockito.when(toDoListRepository.findTaskByDescription(description)).thenReturn(Optional.of(new Task()));
-//
-//        assertThrows(TaskNotFoundException.class, () -> todoListService.validate(description, taskDate));
-//    }
-//
+        when(toDoListRepository.findTaskByDescription(description)).thenReturn(Optional.of(task));
 
+        List<Task> result = todoListService.findByDescription(description);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(description, result.get(0).getDescription());
+
+    }
+    @Test
+    public void testIsTaskComplete_ReturnsTrue() {
+        CreateTaskRequest createTaskRequest = new CreateTaskRequest();
+        createTaskRequest.setDescription("New Task");
+        createTaskRequest.setTaskDate(LocalDateTime.of( 2024,2, 12, 12,10 ));
+        createTaskRequest.setCompletionDate(LocalDateTime.of(2024, 2, 12, 12, 50));
+
+//        createTaskRequest.setCompletionDate(LocalDateTime.of(2024,2, 12, 12,50 ));
+
+        Task task = new Task();
+        task.setId(String.valueOf(1L));
+        task.setDescription("New Task");
+        task.setCompletionDate(LocalDateTime.now());
+
+        when(toDoListRepository.save(any(Task.class))).thenReturn(task);
+
+        TaskDoneRequest taskDoneRequest = new TaskDoneRequest();
+        taskDoneRequest.setDescription("New Task");
+
+        when(toDoListRepository.findTaskByDescription("New Task")).thenReturn(Optional.of(task));
+
+        boolean result = todoListService.isTaskComplete(taskDoneRequest);
+
+        assertTrue(result);
+    }
+
+    @Test
+    public void testIsTaskComplete_ReturnsFalse() {
+        String description = "Test Task";
+        LocalDateTime taskDate = LocalDateTime.now().plusDays(1);
+        LocalDateTime completionDate = LocalDateTime.now();
+        Task task = new Task();
+        task.setDescription(description);
+        task.setTaskDate(taskDate);
+
+        TaskDoneRequest taskDoneRequest = new TaskDoneRequest();
+        taskDoneRequest.setDescription(description);
+        taskDoneRequest.setCompletionDate(completionDate);
+
+        when(toDoListRepository.findTaskByDescription(description)).thenReturn(Optional.of(task));
+
+        boolean result = todoListService.isTaskComplete(taskDoneRequest);
+
+        assertFalse(result);
+    }
+
+    @Test
+    public void testIsTaskComplete_TaskNotFound() {
+        String description = "Non-existent Task";
+        LocalDateTime completionDate = LocalDateTime.now();
+
+        TaskDoneRequest taskDoneRequest = new TaskDoneRequest();
+        taskDoneRequest.setDescription(description);
+        taskDoneRequest.setCompletionDate(completionDate);
+
+        when(toDoListRepository.findTaskByDescription(description)).thenReturn(Optional.empty());
+
+        assertThrows(TaskNotFoundException.class, () -> {
+            todoListService.isTaskComplete(taskDoneRequest);
+        });
+    }
 }
 
