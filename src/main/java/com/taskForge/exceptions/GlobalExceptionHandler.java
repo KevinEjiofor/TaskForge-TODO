@@ -43,7 +43,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 
     }
-    @ExceptionHandler(TaskExistException.class)
+    @ExceptionHandler(TaskNotCompletedException.class)
     public ResponseEntity<Object> completeTaskHandlerException(TaskNotFoundException ex, WebRequest request) {
 
         ExceptionsRespond response = new ExceptionsRespond();

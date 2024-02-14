@@ -4,6 +4,9 @@ function hideError() {
     errorContainer.style.display = "none";
 }
 
+function  fetchGetAllUnfinishedTasks(){
+
+}
 function fetchGetAllTasks() {
     const taskContainer3 = document.getElementById('taskContainer3');
     taskContainer3.innerHTML = '';

@@ -152,7 +152,6 @@ class TodoListServiceImplTest {
         createTaskRequest.setTaskDate(LocalDateTime.of( 2024,2, 12, 12,10 ));
         createTaskRequest.setCompletionDate(LocalDateTime.of(2024, 2, 12, 12, 50));
 
-//        createTaskRequest.setCompletionDate(LocalDateTime.of(2024,2, 12, 12,50 ));
 
         Task task = new Task();
         task.setId(String.valueOf(1L));
@@ -173,20 +172,26 @@ class TodoListServiceImplTest {
 
     @Test
     public void testIsTaskComplete_ReturnsFalse() {
-        String description = "Test Task";
-        LocalDateTime taskDate = LocalDateTime.now().plusDays(1);
-        LocalDateTime completionDate = LocalDateTime.now();
+        CreateTaskRequest createTaskRequest = new CreateTaskRequest();
+        createTaskRequest.setDescription("New Task");
+        createTaskRequest.setTaskDate(LocalDateTime.of( 2024,2, 12, 12,10 ));
+        createTaskRequest.setCompletionDate(LocalDateTime.of(2025, 2, 12, 8, 50));
+
+
         Task task = new Task();
-        task.setDescription(description);
-        task.setTaskDate(taskDate);
+        task.setId(String.valueOf(1L));
+        task.setDescription("New Task");
+        task.setCompletionDate(LocalDateTime.now());
+
+        when(toDoListRepository.save(any(Task.class))).thenReturn(task);
 
         TaskDoneRequest taskDoneRequest = new TaskDoneRequest();
-        taskDoneRequest.setDescription(description);
-        taskDoneRequest.setCompletionDate(completionDate);
+        taskDoneRequest.setDescription("New Task");
 
-        when(toDoListRepository.findTaskByDescription(description)).thenReturn(Optional.of(task));
+        when(toDoListRepository.findTaskByDescription("New Task")).thenReturn(Optional.of(task));
 
         boolean result = todoListService.isTaskComplete(taskDoneRequest);
+
 
         assertFalse(result);
     }

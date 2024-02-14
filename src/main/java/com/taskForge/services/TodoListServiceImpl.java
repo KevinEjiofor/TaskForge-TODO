@@ -74,6 +74,8 @@ public class TodoListServiceImpl implements TodoListService {
             Task task = findTask(taskRequest.getDescription());
             LocalDateTime completionDate = Mapper.parseDate(task.getCompletionDate());
          if(completionDate.isBefore(LocalDateTime.now() )|| completionDate.equals(LocalDateTime.now())){
+
+
              taskRequest.setCompletedTask(true);
              toDoListRepository.save(taskCompleted(taskRequest));
          }else {
