@@ -21,9 +21,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 
     @ExceptionHandler(TaskNotFoundException.class)
-    public ResponseEntity<Object> handleExceptions(TaskNotFoundException ex, WebRequest request) {
+    public ResponseEntity<Object> handleExceptions(TaskNotFoundException ex) {
         ExceptionsRespond response = new ExceptionsRespond();
-        response.setMessage("Task not found. Task either completed or never created");
+        response.setMessage(ex.getMessage());
         response.setTimeDate(LocalDateTime.now());
         response.setErrorCode(101);
 
@@ -32,10 +32,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(TaskExistException.class)
-    public ResponseEntity<Object> TaskExistHandlerException(TaskNotFoundException ex, WebRequest request) {
+    public ResponseEntity<Object> TaskExistHandlerException(TaskNotFoundException ex) {
 
         ExceptionsRespond response = new ExceptionsRespond();
-        response.setMessage("Task with the same description and the same task date already exists");
+        response.setMessage(ex.getMessage());
         response.setTimeDate(LocalDateTime.now());
         response.setErrorCode(101);
 
@@ -50,24 +50,26 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         TaskDoneRequest taskRequest = new TaskDoneRequest();
         response.setMessage("You are meant to finish the task " + taskRequest.getCompletionDate());
         response.setTimeDate(LocalDateTime.now());
-        response.setErrorCode(101);
+        response.setErrorCode(102);
 
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
 
 
     }
-
-    @ExceptionHandler(Exception.class)
-    public ApiRespond<Object> handleGenericException(Exception ex) {
-        return new ApiRespond<>( "An unexpected error occurred: " + ex.getMessage());
-    }
+//
+//    @ExceptionHandler(Exception.class)
+//    public ApiRespond<Object> handleGenericException(Exception ex) {
+//        return new ApiRespond<>( "An unexpected error occurred: " + ex.getMessage());
+//    }
 
     @ExceptionHandler(SearchLengthException.class)
-    public ApiRespond<Object> handleGenericException(SearchLengthException ex) {
-        return new ApiRespond<>("An unexpected error occurred: " + ex.getMessage());
+    public ResponseEntity<Object> handleGenericException(SearchLengthException ex) {
+
+        ExceptionsRespond response = new ExceptionsRespond();
+        response.setMessage(ex.getMessage());
+        response.setTimeDate(LocalDateTime.now());
+        response.setErrorCode(104);
+
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 }
-
-
-
-

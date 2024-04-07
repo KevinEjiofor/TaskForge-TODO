@@ -5,7 +5,6 @@ import com.taskForge.data.models.Task;
 import com.taskForge.dto.Request.CreateTaskRequest;
 import com.taskForge.dto.Request.UpdateTaskRequest;
 import com.taskForge.dto.Respond.ApiRespond;
-import com.taskForge.exceptions.TaskNotFoundException;
 import com.taskForge.services.TodoListService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
-
 @CrossOrigin(origins = "http://localhost:63342")
-
 @RestController
 @RequestMapping("/api/v1")
 @Slf4j
