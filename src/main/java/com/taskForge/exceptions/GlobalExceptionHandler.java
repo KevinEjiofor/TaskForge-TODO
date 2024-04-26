@@ -1,16 +1,12 @@
 package com.taskForge.exceptions;
 
-import com.taskForge.data.models.Task;
 import com.taskForge.dto.Request.TaskDoneRequest;
-import com.taskForge.dto.Respond.ApiRespond;
-
-
 import com.taskForge.dto.Respond.ExceptionsRespond;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
+
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.time.LocalDateTime;
@@ -44,11 +40,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     }
     @ExceptionHandler(TaskNotCompletedException.class)
-    public ResponseEntity<Object> completeTaskHandlerException(TaskNotFoundException ex, WebRequest request) {
+    public ResponseEntity<Object> completeTaskHandlerException(TaskNotFoundException ex) {
 
         ExceptionsRespond response = new ExceptionsRespond();
         TaskDoneRequest taskRequest = new TaskDoneRequest();
-        response.setMessage("You are meant to finish the task " + taskRequest.getCompletionDate());
+        response.setMessage( ex.getMessage() + "You are meant to finish the task " + taskRequest.getCompletionDate());
         response.setTimeDate(LocalDateTime.now());
         response.setErrorCode(102);
 
